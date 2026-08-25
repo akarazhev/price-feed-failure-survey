@@ -116,7 +116,7 @@ def main():
             })
 
         print(f"  [{i}/{len(orgs)}] {cls:<9} {org:<22} {len(items):>3}"
-              f"  всего {data.get('total_count', 0)}")
+              f"  of {data.get('total_count', 0)}")
         time.sleep(PAUSE)
 
     with open("raw.json", "w", encoding="utf-8") as f:

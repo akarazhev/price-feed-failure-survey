@@ -1,19 +1,19 @@
-# Организации для обзора наблюдаемости фидов.
+# Organisations surveyed for feed-handling repair commits.
 #
-# Класс определяется тем, какую роль фид играет для организации:
+# The class is decided by the role a feed plays for the organisation:
 #
-#   PUBLISHER — фид является продуктом: оракулы и провайдеры данных
-#   CONSUMER  — фид потребляется, чтобы на нём работали деньги
-#   INDEXER   — ингестят и переиздают производные данные
-#   TOOLING   — открытые клиентские библиотеки; их продукт и есть
-#               обработка подключения, поэтому коммит про reconnect
-#               у них плановая работа, а не след инцидента
+#   PUBLISHER — the feed is the product: oracles and data providers
+#   CONSUMER  — the feed is consumed so that money can move on it
+#   INDEXER   — ingests and republishes derived data
+#   TOOLING   — open-source client libraries; their product IS connection
+#               handling, so a reconnect commit here is planned work rather
+#               than the trace of an incident
 #
-# Головное сравнение — PUBLISHER против CONSUMER. INDEXER и TOOLING
-# собираются и публикуются, но в него не входят.
+# The comparison that matters is PUBLISHER against CONSUMER. INDEXER and
+# TOOLING are collected and published but kept out of it.
 #
-# Формат: КЛАСС<таб>организация. Организации без совпадений остаются
-# в списке: они часть знаменателя.
+# Format: CLASS<tab>organisation. Organisations that returned no matches stay
+# in the list: they are part of the denominator.
 
 PUBLISHER	smartcontractkit
 PUBLISHER	pyth-network
