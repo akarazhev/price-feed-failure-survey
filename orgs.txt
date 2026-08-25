@@ -1,0 +1,76 @@
+# Организации для обзора наблюдаемости фидов.
+#
+# Класс определяется тем, какую роль фид играет для организации:
+#
+#   PUBLISHER — фид является продуктом: оракулы и провайдеры данных
+#   CONSUMER  — фид потребляется, чтобы на нём работали деньги
+#   INDEXER   — ингестят и переиздают производные данные
+#   TOOLING   — открытые клиентские библиотеки; их продукт и есть
+#               обработка подключения, поэтому коммит про reconnect
+#               у них плановая работа, а не след инцидента
+#
+# Головное сравнение — PUBLISHER против CONSUMER. INDEXER и TOOLING
+# собираются и публикуются, но в него не входят.
+#
+# Формат: КЛАСС<таб>организация. Организации без совпадений остаются
+# в списке: они часть знаменателя.
+
+PUBLISHER	smartcontractkit
+PUBLISHER	pyth-network
+PUBLISHER	flare-foundation
+PUBLISHER	diadata-org
+PUBLISHER	api3dao
+PUBLISHER	tellor-io
+PUBLISHER	UMAprotocol
+PUBLISHER	chronicleprotocol
+PUBLISHER	bandprotocol
+PUBLISHER	redstone-finance
+
+CONSUMER	Uniswap
+CONSUMER	sky-ecosystem
+CONSUMER	euler-xyz
+CONSUMER	balancer
+CONSUMER	jito-foundation
+CONSUMER	bitfinexcom
+CONSUMER	morpho-org
+CONSUMER	gmx-io
+CONSUMER	compound-finance
+CONSUMER	synthetixio
+CONSUMER	Polymarket
+CONSUMER	coinbase
+CONSUMER	curvefi
+CONSUMER	dydxprotocol
+CONSUMER	InjectiveLabs
+CONSUMER	bybit-exchange
+CONSUMER	tradeparadex
+CONSUMER	aave
+CONSUMER	perpetual-protocol
+CONSUMER	derivexyz
+CONSUMER	binance
+CONSUMER	ethena-labs
+CONSUMER	kamino-finance
+CONSUMER	hyperliquid-dex
+CONSUMER	fireflyprotocol
+CONSUMER	raydium-io
+CONSUMER	krakenfx
+CONSUMER	zetamarkets
+CONSUMER	vertex-protocol
+CONSUMER	orca-so
+CONSUMER	mux-world
+CONSUMER	GainsNetwork-org
+CONSUMER	drift-labs
+
+INDEXER	graphprotocol
+INDEXER	duneanalytics
+INDEXER	coinmetrics
+INDEXER	tardis-dev
+INDEXER	goldsky-io
+INDEXER	subquery
+INDEXER	messari
+INDEXER	CoinAPI
+
+TOOLING	nautechsystems
+TOOLING	ccxt
+TOOLING	hummingbot
+TOOLING	freqtrade
+TOOLING	jesse-ai
