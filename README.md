@@ -140,6 +140,15 @@ python3 collect.py orgs.txt   # -> raw.json
 python3 analyse.py            # -> data/commits.csv, prints the tables above
 ```
 
+Duplicate commits are dropped **within** an organisation, not across the run.
+Two organisations holding the same fork both legitimately contain that commit,
+and a set shared across the whole run gives it to whichever was queried first
+while the second silently loses it — with the progress line still printing the
+count the API returned. That defect was found on 8 September while running the
+same collector over a larger list, where it cost one organisation four commits.
+It did not affect this dataset: the eight organisations here that produced no
+rows were re-queried and all eight genuinely return nothing.
+
 `collect.py` reads the 56 organisations in [`orgs.txt`](orgs.txt), asks for the
 newest 40 matches in each, and stores whole commit messages. It pauses 3.5
 seconds between requests and retries on the secondary rate limit — a first pass

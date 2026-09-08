@@ -75,7 +75,7 @@ def main():
         sys.exit("set GITHUB_TOKEN — commit search needs authentication")
 
     orgs = read_orgs(sys.argv[1] if len(sys.argv) > 1 else "orgs.txt")
-    records, seen, empty, failed = [], set(), [], []
+    records, empty, failed = [], [], []
 
     for i, (cls, org) in enumerate(orgs, 1):
         try:
@@ -92,6 +92,13 @@ def main():
         if not items:
             empty.append(org)
 
+        # Per organisation, not per run. A shared set silently drops an
+        # organisation's commits when an earlier one already returned the same
+        # sha - which happens whenever two organisations hold the same fork -
+        # and the progress line still prints the count the API returned, so the
+        # log says four and the data holds none. That is the same silent loss
+        # the retry above exists to prevent, one level down.
+        seen = set()
         for it in items:
             sha = it["sha"]
             if sha in seen:                       # forks inside one org
