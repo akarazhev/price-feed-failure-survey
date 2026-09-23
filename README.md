@@ -1,7 +1,19 @@
 # Who notices when a price feed goes wrong
 
-**1,163 commits that repair feed handling, across 48 crypto organisations.**
+**1,163 commits matching six feed-failure terms, across 48 crypto organisations.**
 Collected 25 August 2026.
+
+> **Correction, 23 September 2026.** This page first said "1,163 commits that
+> repair feed handling". That was wrong. A hand check of 100 randomly sampled
+> commits, reading each diff, found that **about 17% repair feed handling**
+> (95% interval 11–26%, roughly 200 of the 1,163), about 41% touch feed handling
+> at all, and **59% are not about feeds** — documentation, CI, and above all
+> `stale` in its other meanings: a query cache, an expired order, UI state, an
+> out-of-date link. An outside reader flagged the first false match on
+> 14 September; I should have checked then. The method, the sample and every
+> classification are in [Precision](#precision-checked-23-september-2026) and
+> [`data/precision-sample.csv`](data/precision-sample.csv). The two findings
+> below are qualified where they relied on "repair".
 
 Software that consumes market data has a failure mode with no alarm attached:
 the feed keeps answering, and the answers stop being true. A reconnect that
@@ -53,6 +65,10 @@ reconnect commit is planned product work, not the trace of an incident.
   about the word, not about the world.
 - **The classification is a judgement.** It is in [`orgs.txt`](orgs.txt), line
   by line, and it can be argued with.
+- **A match is not a repair.** *(Added 23 September 2026.)* Only about 17% of
+  matched commits repair feed handling; 59% are not about feeds at all. `stale`
+  is the noisiest term: 43 of 61 sampled `stale` commits were unrelated. Every
+  number below counts matches, not repairs.
 
 ## The sample
 
@@ -82,8 +98,13 @@ Restricted to organisations under the cap, where nothing is truncated:
 publishers 63%, consumers 51%.
 
 Truncation can only hide recurrence, never invent it, so these are floors. In
-roughly three of five repositories that ever repaired feed handling, it came
-back.
+roughly three of five repositories with any match, the terms came back.
+
+*Corrected 23 September 2026:* this section first said that in three of five
+repositories "that ever repaired feed handling, it came back". With 59% of
+matches unrelated to feeds, recurring matches do not show recurring faults.
+Whether repairs recur needs a larger checked sample; until then this table is
+about vocabulary.
 
 ## Publishers and consumers do not have the same problem
 
@@ -106,9 +127,15 @@ publish them.
 **Heartbeat is a publisher problem: 18% against 6%.** Three times the other way.
 
 The reading is not complicated. A publisher's job is to emit a signal that
-proves it is alive and current, so its repair work is about that signal. A
+proves it is alive and current, so its feed work is about that signal. A
 consumer's problem is that the transport underneath fails, and it finds out
 when the connection drops.
+
+*Qualified 23 September 2026:* this split is in the words people use, not in
+their faults. In the checked sample, publisher `heartbeat` commits were features
+and service liveness logs, not repairs, and publishers had one repair out of 25
+checked commits. Read the columns as where each side's feed work is, not where
+its failures are.
 
 **Tooling behaves like consumers** — reconnect 12%, heartbeat 6% — which is
 what should happen if the classification means anything: a client library
@@ -128,6 +155,50 @@ side of the feed you sit.
 
 **Nor does it show severity.** A one-line timeout bump and a week reconstructing
 a bad window are one commit each.
+
+## Precision, checked 23 September 2026
+
+**Sample.** 100 of the 1,163 commits, drawn at random (`random.seed(20260923)`)
+in proportion to the six terms: `stale` 63, `backfill` 12, `heartbeat` 12,
+`reconnect` 11, `resubscribe` 1, `desync` 1. Two could no longer be fetched
+(history rewritten) and are left out, so the base is 98.
+
+**What was read.** The diff of each commit, not its subject. Three buckets,
+written down before the first diff was opened:
+
+- **R** — changes code that receives, checks or recovers a market-data stream
+  or price feed in order to fix wrong behaviour: staleness, reconnect,
+  heartbeat, gap backfill, resubscription, desync;
+- **F** — the same code, but a feature, refactor, tuning or test rather than a
+  fix;
+- **N** — not about feeds: documentation, CI, dependencies, bots, or the term in
+  another sense.
+
+Doubt between R and F went to F, between F and N to N. One rule was tightened
+at the 16th commit and is recorded as such: request-response caches and an
+application's own data count as N, not as a feed.
+
+| | share of 98 | 95% Wilson interval | of 1,163, weighted by term |
+|---|--:|--:|--:|
+| R — repairs feed handling | 17.3% | 11.1–26.0% | ≈ 199 |
+| R + F — touches feed handling | 40.8% | 31.6–50.7% | ≈ 473 |
+| N — not about feeds | 59.2% | | ≈ 690 |
+
+| term | R | F | N |
+|---|--:|--:|--:|
+| `stale` | 9 | 9 | 43 |
+| `backfill` | 2 | 4 | 6 |
+| `heartbeat` | 3 | 4 | 5 |
+| `reconnect` | 2 | 6 | 3 |
+| `resubscribe` | 1 | 0 | 0 |
+| `desync` | 0 | 0 | 1 |
+
+Counting request caches and application data as feeds instead raises R to at
+most 23.5% and R + F to 46.9%; the conclusion does not change.
+
+Every classification, with a one-line reason, is in
+[`data/precision-sample.csv`](data/precision-sample.csv). If you think one is
+wrong, that file is where to argue it.
 
 ## Reproducing this
 
