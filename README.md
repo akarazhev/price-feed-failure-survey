@@ -1,74 +1,47 @@
 # Who notices when a price feed goes wrong
 
-**1,163 commits matching six feed-failure terms, across 48 crypto organisations.**
-Collected 25 August 2026.
+1,163 commits matching six feed-failure terms, across 48 crypto organisations, collected on 25 August 2026.
+The dataset is in [`data/commits.csv`](data/commits.csv), and every row links to its commit.
 
-> **Correction, 23 September 2026.** This page first said "1,163 commits that
-> repair feed handling". That was wrong. A hand check of 100 randomly sampled
-> commits, reading each diff, found that **about 17% repair feed handling**
-> (95% interval 11–26%, roughly 200 of the 1,163), about 41% touch feed handling
-> at all, and **59% are not about feeds** — documentation, CI, and above all
-> `stale` in its other meanings: a query cache, an expired order, UI state, an
-> out-of-date link. An outside reader flagged the first false match on
-> 14 September; I should have checked then. The method, the sample and every
-> classification are in [Precision](#precision-checked-23-september-2026) and
-> [`data/precision-sample.csv`](data/precision-sample.csv). The two findings
-> below are qualified where they relied on "repair".
+> **Correction, 23 September 2026.** This page first said "1,163 commits that repair feed handling". That was
+> wrong. I read the diffs of 100 random commits: about 17% repair feed handling (95% interval 11–26%, roughly
+> 200 of the 1,163), about 41% touch feed handling at all, and 59% have nothing to do with feeds. Most of those
+> use `stale` in another sense: a query cache, an expired order, UI state, an old link. An outside reader
+> pointed at the first false match on 14 September, and I should have checked then. Everything below counts
+> matches, not repairs; the check itself is in [Precision](#precision-checked-23-september-2026).
 
-Software that consumes market data has a failure mode with no alarm attached:
-the feed keeps answering, and the answers stop being true. A reconnect that
-silently loses its place in the sequence. A stale window that looks like a
-quiet market. Afterwards there is no record of what the feed was doing.
+Software that consumes market data can fail without any alarm: the feed keeps answering, and the answers stop
+being true. A reconnect quietly loses its place in the sequence, or a stale window looks like a quiet market.
+I wanted to know whether this keeps coming back or gets fixed once, and public code can answer that, because
+the people who fix it commit the fix. So I counted.
 
-Whether that is a real and recurring problem, or one that gets fixed once and
-stays fixed, is answerable from public code — the people who fix it commit the
-fix. So I counted.
+## Method and limits
 
-The dataset is in [`data/commits.csv`](data/commits.csv). Every row links to the
-commit.
+I searched the commits of 56 organisations through the GitHub API for six terms: `stale`, `reconnect`,
+`heartbeat`, `backfill`, `desync`, `resubscribe` (the API allows no more than five `OR`s). 48 organisations
+returned matches, and each contributes at most its newest 40 commits.
 
----
-
-## Method, and four things it does not cover
-
-Fifty-six organisations were queried through the GitHub commit search API for
-six terms: `stale`, `reconnect`, `heartbeat`, `backfill`, `desync`,
-`resubscribe`. Six is the ceiling — the API allows at most five `OR` operators.
-Forty-eight returned matches. Each organisation contributes at most its newest
-40 commits.
-
-Organisations are classified by **the role a feed plays for them**:
+Each organisation is classified by the role a feed plays for it:
 
 | | |
 |---|---|
-| **PUBLISHER** | the feed is the product — oracles and data providers |
+| **PUBLISHER** | the feed is the product: oracles and data providers |
 | **CONSUMER** | the feed is consumed so that money can move on it |
 | **INDEXER** | ingests and republishes derived data |
-| **TOOLING** | open-source client libraries whose product *is* connection handling |
+| **TOOLING** | open-source client libraries whose product is connection handling |
 
-The comparison that matters is publisher against consumer. Indexers and tooling
-are collected and published but kept out of it: for a library like `ccxt`, a
-reconnect commit is planned product work, not the trace of an incident.
+The comparison that matters is publishers against consumers. Indexers and tooling are published but kept out of
+it: for a library like `ccxt`, a reconnect commit is planned work, not the trace of an incident.
 
-**Four limits, before any number below is used:**
+What to keep in mind before using any number here:
 
-- **The sample skews recent.** Newest-40 per organisation means 733 of 1,163
-  commits are from 2026, though the range runs back to 2017. Older repair work
-  is underrepresented.
-- **Nineteen of 48 organisations hit the cap.** Their real totals are higher.
-  The cap is not tidiness: one organisation alone returns more matches than the
-  other nine publishers together, and without it "publisher" would mean that
-  one company.
-- **Six words are not the vocabulary.** A commit that says "fix price feed"
-  without any of them is invisible here. One of the six, `desync`, turned out
-  to be almost unused — it accounts for under 1% everywhere, which is a fact
-  about the word, not about the world.
-- **The classification is a judgement.** It is in [`orgs.txt`](orgs.txt), line
-  by line, and it can be argued with.
-- **A match is not a repair.** *(Added 23 September 2026.)* Only about 17% of
-  matched commits repair feed handling; 59% are not about feeds at all. `stale`
-  is the noisiest term: 43 of 61 sampled `stale` commits were unrelated. Every
-  number below counts matches, not repairs.
+- The sample skews recent: with the newest 40 per organisation, 733 of the 1,163 commits are from 2026.
+- 19 of the 48 organisations hit the cap, so their real totals are higher. Without the cap, one organisation
+  would outweigh the other nine publishers together.
+- Six words are not the whole vocabulary. "Fix price feed" without any of them is invisible here, and `desync`
+  turned out to be almost unused.
+- The classification is my judgement. It is in [`orgs.txt`](orgs.txt), line by line.
+- A match is not a repair (see the correction above).
 
 ## The sample
 
@@ -79,13 +52,11 @@ reconnect commit is planned product work, not the trace of an incident.
 | INDEXER | 6 | 24 | 150 |
 | TOOLING | 5 | 11 | 145 |
 
-Eight organisations were queried and returned nothing. They stay in `orgs.txt`,
-because a denominator that quietly drops its misses is not a denominator.
+Eight organisations returned nothing. They stay in `orgs.txt` so the denominator is honest.
 
-## It does not get fixed once
+## The terms come back
 
-Among repositories with at least one such commit, the share that have **two or
-more**:
+Among repositories with at least one match, the share with two or more:
 
 | class | repositories | with ≥2 | share | median | max |
 |---|--:|--:|--:|--:|--:|
@@ -94,22 +65,13 @@ more**:
 | INDEXER | 24 | 12 | 50% | 2 | 38 |
 | TOOLING | 11 | 7 | 64% | 3 | 40 |
 
-Restricted to organisations under the cap, where nothing is truncated:
-publishers 63%, consumers 51%.
+In organisations under the cap, where nothing is cut off: publishers 63%, consumers 51%. The cap can only hide
+recurrence, so these are floors. Because most matches are not repairs, this table shows that the vocabulary
+recurs, not the faults. Whether repairs recur needs a larger checked sample.
 
-Truncation can only hide recurrence, never invent it, so these are floors. In
-roughly three of five repositories with any match, the terms came back.
+## Publishers and consumers write about different things
 
-*Corrected 23 September 2026:* this section first said that in three of five
-repositories "that ever repaired feed handling, it came back". With 59% of
-matches unrelated to feeds, recurring matches do not show recurring faults.
-Whether repairs recur needs a larger checked sample; until then this table is
-about vocabulary.
-
-## Publishers and consumers do not have the same problem
-
-Share of commits whose **first 120 characters** name each term — the subject
-line a reviewer actually reads:
+Share of commits whose first 120 characters, the subject a reviewer reads, name each term:
 
 | class | n | stale | backfill | heartbeat | resubscribe | reconnect |
 |---|--:|--:|--:|--:|--:|--:|
@@ -118,71 +80,36 @@ line a reviewer actually reads:
 | INDEXER | 150 | 26% | 3% | 2% | 0% | 2% |
 | TOOLING | 145 | 17% | 3% | 6% | 0% | 12% |
 
-Two columns separate cleanly, and they separate in opposite directions.
+Reconnect shows up in consumers' subjects thirteen times as often as in publishers' (13% against 1%), and
+heartbeat three times as often the other way (18% against 6%). A publisher's job is to emit a signal that
+proves it is alive, so its feed work is about that signal; a consumer finds out about a failing transport when
+the connection drops. Tooling looks like consumers (reconnect 12%, heartbeat 6%), as it should: a client library
+connects to somebody else's feed. Counting whole messages changes the levels but not the split.
 
-**Reconnect is a consumer problem: 13% against 1%.** Thirteen times more common
-in the subject lines of organisations that consume feeds than of those that
-publish them.
+This split is in the words, not necessarily in the faults. In the checked sample, publishers' `heartbeat`
+commits were features and liveness logs, and publishers had one repair among 25 checked commits.
 
-**Heartbeat is a publisher problem: 18% against 6%.** Three times the other way.
-
-The reading is not complicated. A publisher's job is to emit a signal that
-proves it is alive and current, so its feed work is about that signal. A
-consumer's problem is that the transport underneath fails, and it finds out
-when the connection drops.
-
-*Qualified 23 September 2026:* this split is in the words people use, not in
-their faults. In the checked sample, publisher `heartbeat` commits were features
-and service liveness logs, not repairs, and publishers had one repair out of 25
-checked commits. Read the columns as where each side's feed work is, not where
-its failures are.
-
-**Tooling behaves like consumers** — reconnect 12%, heartbeat 6% — which is
-what should happen if the classification means anything: a client library
-connects to somebody else's feed and hits the consumer's side of the problem.
-
-Counting whole messages rather than subjects moves the levels but not the
-split: reconnect 14% for consumers against 4% for publishers, heartbeat 10%
-against 22%.
-
-## What this does not show
-
-**A commit proves engineering time was spent. It does not prove anyone would
-buy a tool.** Those are different claims and this dataset only supports the
-first. Nothing here says the work is unwelcome, mispriced, or worth
-outsourcing — only that it recurs, and that where it recurs depends on which
-side of the feed you sit.
-
-**Nor does it show severity.** A one-line timeout bump and a week reconstructing
-a bad window are one commit each.
+A commit shows that engineering time went into something. It doesn't show that anyone would buy a tool, and it
+doesn't show severity: a one-line timeout bump and a week rebuilding a bad window are one commit each.
 
 ## Precision, checked 23 September 2026
 
-**Sample.** 100 of the 1,163 commits, drawn at random (`random.seed(20260923)`)
-in proportion to the six terms: `stale` 63, `backfill` 12, `heartbeat` 12,
-`reconnect` 11, `resubscribe` 1, `desync` 1. Two could no longer be fetched
-(history rewritten) and are left out, so the base is 98.
+I drew 100 of the 1,163 commits at random (`random.seed(20260923)`), in proportion to the six terms: `stale` 63,
+`backfill` 12, `heartbeat` 12, `reconnect` 11, `resubscribe` 1, `desync` 1. Two could no longer be fetched, so
+the base is 98. I read the diff of each and put it in one of three buckets, written down before the first diff:
 
-**What was read.** The diff of each commit, not its subject. Three buckets,
-written down before the first diff was opened:
+- **R**: fixes wrong behaviour in code that receives, checks or recovers a market-data stream or price feed;
+- **F**: the same code, but a feature, refactor, tuning or test;
+- **N**: not about feeds (docs, CI, dependencies, bots, or the term in another sense).
 
-- **R** — changes code that receives, checks or recovers a market-data stream
-  or price feed in order to fix wrong behaviour: staleness, reconnect,
-  heartbeat, gap backfill, resubscription, desync;
-- **F** — the same code, but a feature, refactor, tuning or test rather than a
-  fix;
-- **N** — not about feeds: documentation, CI, dependencies, bots, or the term in
-  another sense.
-
-Doubt between R and F went to F, between F and N to N. One rule was tightened
-at the 16th commit and is recorded as such: request-response caches and an
-application's own data count as N, not as a feed.
+Doubt between R and F went to F, between F and N to N. One rule was tightened at the 16th commit:
+request-response caches and an application's own data count as N.
 
 | | share of 98 | 95% Wilson interval | of 1,163, weighted by term |
 |---|--:|--:|--:|
-| R — repairs feed handling | 17.3% | 11.1–26.0% | ≈ 199 |
-| R + F — touches feed handling | 40.8% | 31.6–50.7% | ≈ 473 |
-| N — not about feeds | 59.2% | | ≈ 690 |
+| R: repairs feed handling | 17.3% | 11.1–26.0% | ≈ 199 |
+| R + F: touches feed handling | 40.8% | 31.6–50.7% | ≈ 473 |
+| N: not about feeds | 59.2% | | ≈ 690 |
 
 | term | R | F | N |
 |---|--:|--:|--:|
@@ -193,17 +120,13 @@ application's own data count as N, not as a feed.
 | `resubscribe` | 1 | 0 | 0 |
 | `desync` | 0 | 0 | 1 |
 
-Counting request caches and application data as feeds instead raises R to at
-most 23.5% and R + F to 46.9%; the conclusion does not change.
-
-Every classification, with a one-line reason, is in
-[`data/precision-sample.csv`](data/precision-sample.csv). If you think one is
-wrong, that file is where to argue it.
+Counting caches and application data as feeds would raise R to at most 23.5% and R + F to 46.9%; the conclusion
+stays the same. Every classification, with a one-line reason, is in
+[`data/precision-sample.csv`](data/precision-sample.csv).
 
 ## Reproducing this
 
-No dependencies beyond Python 3. A token is needed in `GITHUB_TOKEN` — commit
-search is not available anonymously.
+Python 3 and a `GITHUB_TOKEN` (commit search doesn't work anonymously):
 
 ```sh
 export GITHUB_TOKEN=...
@@ -211,56 +134,19 @@ python3 collect.py orgs.txt   # -> raw.json
 python3 analyse.py            # -> data/commits.csv, prints the tables above
 ```
 
-Duplicate commits are dropped **within** an organisation, not across the run.
-Two organisations holding the same fork both legitimately contain that commit,
-and a set shared across the whole run gives it to whichever was queried first
-while the second silently loses it — with the progress line still printing the
-count the API returned. That defect was found on 8 September while running the
-same collector over a larger list, where it cost one organisation four commits.
-It did not affect this dataset: the eight organisations here that produced no
-rows were re-queried and all eight genuinely return nothing.
-
-`collect.py` reads the 56 organisations in [`orgs.txt`](orgs.txt), asks for the
-newest 40 matches in each, and stores whole commit messages. It pauses 3.5
-seconds between requests and retries on the secondary rate limit — a first pass
-without that quietly lost 28 organisations and reported success.
-
-`analyse.py` assigns each commit one fault by first match against the patterns
-at the top of the file. Those patterns are the six search terms and their
-spellings and nothing else: the sample was selected by those terms, so a bucket
-for a synonym would count something the query never asked for. The order only
-decides 47 of 1,163 commits — 4% — because the rest carry exactly one term.
-
-Whole messages are kept in `raw.json` because that is where the term often is.
-Squashed pull requests here run to 64,000 characters and the matching word can
-sit at offset 14,000; an earlier 300-character cut put a third of the sample in
-an "other" bucket that should not have existed.
-
-Run `analyse.py` against the committed `raw.json` and you get
-[`data/commits.csv`](data/commits.csv) byte for byte, so a disagreement is with
-a rule you can read rather than a number you have to trust.
-
-Cells opening with `=`, `+`, `-` or `@` are prefixed with a quote before being
-written. Commit subjects are whatever someone typed, and a spreadsheet would
-treat such a cell as a formula.
-
-Re-running `collect.py` today will not reproduce this dataset — repositories
-move on. `raw.json` is committed so the analysis stays checkable regardless.
+`collect.py` asks for the newest 40 matches per organisation, keeps whole commit messages and pauses between
+requests. `analyse.py` gives each commit one failure type, by the first term it matches. Running it on the committed `raw.json`
+reproduces `data/commits.csv` byte for byte; running `collect.py` today won't reproduce the dataset, because
+repositories move on.
 
 ## Data
 
-[`data/commits.csv`](data/commits.csv) — 1,163 rows: class, organisation,
-repository, date, fault, author login, subject, and a link to the commit.
+- [`data/commits.csv`](data/commits.csv): 1,163 rows with class, organisation, repository, date, failure type,
+  author login, subject and a link to the commit.
+- [`raw.json`](raw.json): what the collector saw, with whole messages.
 
-[`raw.json`](raw.json) — what the collector saw, with whole commit messages.
-Faults are derived from these, so this is what to look at if a classification
-seems wrong.
-
-Author logins are recorded where GitHub publishes them. Commit metadata also
-carries email addresses; those are not collected.
-
-Corrections are welcome. If an organisation is in the wrong class or a fault is
-misassigned, the link is right there and I would rather fix it.
+Author logins are kept where GitHub publishes them; email addresses are not collected. If an organisation is in
+the wrong class or a commit is misassigned, tell me and I'll fix it.
 
 ---
 
